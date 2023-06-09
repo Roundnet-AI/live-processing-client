@@ -123,7 +123,14 @@ if __name__ == "__main__":
     try:
         assert os.path.exists("Config.ini"), "Config.ini file not found. Please restore or create it."
         assert os.path.exists("Login.ini"), "Login.ini file not found. Please restore or create it."
+        print("""    ____    ____    __  __    _   __    ____     _   __    ______  ______           ___     ____
+   / __ \  / __ \  / / / /   / | / /   / __ \   / | / /   / ____/ /_  __/          /   |   /  _/
+  / /_/ / / / / / / / / /   /  |/ /   / / / /  /  |/ /   / __/     / /            / /| |   / /  
+ / _, _/ / /_/ / / /_/ /   / /|  /   / /_/ /  / /|  /   / /___    / /            / ___ | _/ /   
+/_/ |_|  \____/  \____/   /_/ |_/   /_____/  /_/ |_/   /_____/   /_/            /_/  |_|/___/   
+                                                                                                """)
         print("Starting client...")
+        print("To terminate, close the terminal window at any time.")
         config = configparser.ConfigParser()
         config.read(["Config.ini", "Login.ini"])
         client = FileManagerClient(
