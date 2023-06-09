@@ -23,7 +23,7 @@ jobs:
           pip install pyinstaller
       
       - name: Create Executable
-        run: pyinstaller --onefile client.py --name RoundnetAI_TournamentClient${{ env.tag }} --icon img/logo.ico
+        run: pyinstaller --onefile client.py --name RoundnetAI_TournamentClient_${{ env.tag }} --icon img/logo.ico
 
       - name: Zip Necessary Files
         uses: vimtor/action-zip@v1
