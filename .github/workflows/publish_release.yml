@@ -28,14 +28,14 @@ jobs:
       - name: Zip Necessary Files
         uses: vimtor/action-zip@v1
         with:
-          files: dist/RoundnetAI_TournamentClient_${{ env.tag }}.exe Config.ini Login_Example.ini README.md
-          dest: dist/RoundnetAI_TournamentClient_${{ env.tag }}.zip
+          files: RoundnetAI_TournamentClient_${{ env.tag }}.exe Config.ini Login_Example.ini README.md
+          dest: RoundnetAI_TournamentClient_${{ env.tag }}.zip
 
       - name: Publish a New Release
         id: release
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          artifacts: dist/RoundnetAI_TournamentClient_${{ env.tag }}.zip, dist/RoundnetAI_TournamentClient_${{ env.tag }}.exe
+          artifacts: RoundnetAI_TournamentClient_${{ env.tag }}.zip, RoundnetAI_TournamentClient_${{ env.tag }}.exe
           tag: ${{ env.tag }}
           token: ${{ secrets.GITHUB_TOKEN }}
