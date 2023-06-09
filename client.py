@@ -108,8 +108,10 @@ class FileManagerClient:
 
     def _list_s3_files(self) -> "list[str]":
         files = []
-        for obj in self.s3.list_objects(Bucket=self.download_bucket)["Contents"]:
-            files.append(obj["Key"])
+        objs = self.s3.list_objects(Bucket=self.download_bucket)
+        if "Contents" in objs:
+            for obj in objs["Contents"]:
+                files.append(obj["Key"])
         return files
 
     def _download_file(self, file: str):
