@@ -7,6 +7,7 @@ import time
 import threading
 import signal
 import sys
+import traceback
 
 class FileManagerClient:
     def __init__(self, upload_bucket: str, download_bucket: str, aws_access_key_id: str, aws_secret_access_key: str, input: str = "./input", output: str = "./output", **kwargs):
@@ -119,38 +120,43 @@ class FileManagerClient:
             json.dump(self.download_history, f)
 
 if __name__ == "__main__":
-    assert os.path.exists("Config.ini"), "Config.ini file not found. Please restore or create it."
-    assert os.path.exists("Login.ini"), "Login.ini file not found. Please restore or create it."
-    print("Starting client...")
-    config = configparser.ConfigParser()
-    config.read(["Config.ini", "Login.ini"])
-    client = FileManagerClient(
-        upload_bucket=config["S3"]["input_bucket"],
-        download_bucket=config["S3"]["output_bucket"],
-        aws_access_key_id=config["AWS"]["aws_access_key_id"],
-        aws_secret_access_key=config["AWS"]["aws_secret_access_key"],
-    )
+    try:
+        assert os.path.exists("Config.ini"), "Config.ini file not found. Please restore or create it."
+        assert os.path.exists("Login.ini"), "Login.ini file not found. Please restore or create it."
+        print("Starting client...")
+        config = configparser.ConfigParser()
+        config.read(["Config.ini", "Login.ini"])
+        client = FileManagerClient(
+            upload_bucket=config["S3"]["input_bucket"],
+            download_bucket=config["S3"]["output_bucket"],
+            aws_access_key_id=config["AWS"]["aws_access_key_id"],
+            aws_secret_access_key=config["AWS"]["aws_secret_access_key"],
+        )
 
-    # Create two threads for manage_input and manage_output
-    input_thread = threading.Thread(target=client._manage_input)
-    output_thread = threading.Thread(target=client._manage_output)
+        # Create two threads for manage_input and manage_output
+        input_thread = threading.Thread(target=client._manage_input)
+        output_thread = threading.Thread(target=client._manage_output)
 
-    # Start both threads
-    input_thread.start()
-    output_thread.start()
+        # Start both threads
+        input_thread.start()
+        output_thread.start()
 
-    # Function to handle termination signal
-    def handle_termination_signal(signal, frame):
-        print("Gracefully terminating (~30s)...")
-        client.running = False
-        input_thread.join()
-        output_thread.join()
-        sys.exit(0)
+        # Function to handle termination signal
+        def handle_termination_signal(signal, frame):
+            print("Gracefully terminating (~30s)...")
+            client.running = False
+            input_thread.join()
+            output_thread.join()
+            sys.exit(0)
 
-    # Register the termination signal handler
-    signal.signal(signal.SIGINT, handle_termination_signal)
-    signal.signal(signal.SIGTERM, handle_termination_signal)
+        # Register the termination signal handler
+        signal.signal(signal.SIGINT, handle_termination_signal)
+        signal.signal(signal.SIGTERM, handle_termination_signal)
 
-    # Keep the main thread alive
-    while True:
-        time.sleep(1)
+        # Keep the main thread alive
+        while True:
+            time.sleep(1)
+    except Exception as e:
+        trace = traceback.format_exc()
+        print(trace)
+        input("Application failed. Read above information to determine root cause.")
