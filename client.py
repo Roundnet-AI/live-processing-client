@@ -8,6 +8,7 @@ import threading
 import signal
 import sys
 import traceback
+import tqdm
 
 class FileManagerClient:
     def __init__(self, upload_bucket: str, download_bucket: str, aws_access_key_id: str, aws_secret_access_key: str, input: str = "./input", output: str = "./output", **kwargs):
@@ -30,6 +31,7 @@ class FileManagerClient:
                 to 30.
         """
         self.input = Path(input)
+        self.input_archive = Path(input + "_archive")
         self.output = Path(output)
         self.upload_bucket = upload_bucket
         self.download_bucket = download_bucket
@@ -42,6 +44,8 @@ class FileManagerClient:
             self.input.mkdir()
         if not self.output.exists():
             self.output.mkdir()
+        if not self.input_archive.exists():
+            self.input_archive.mkdir()
         self.upload_fp = kwargs.get("upload_history", "upload_history.json")
         self.download_fp = kwargs.get("download_history", "download_history.json")
         if not (Path(self.upload_fp)).exists():
@@ -54,7 +58,7 @@ class FileManagerClient:
                 json.dump([], f)
         self.upload_history = json.load(open(self.upload_fp))
         self.download_history = json.load(open(self.download_fp))
-        self.sleep_interval = kwargs.get("sleep_interval", 30)
+        self.sleep_interval = kwargs.get("sleep_interval", 10)
         self.running = True
 
     def _check_input_files(self) -> "list[Path]":
@@ -82,11 +86,18 @@ class FileManagerClient:
             file (Path): File to upload.
         """
         print(f"Uploading {file} to S3...")
-        self.s3.upload_file(file, self.upload_bucket, file.name)
+        file_size = os.stat(file).st_size
+        with tqdm.tqdm(total=file_size, unit="B", unit_scale=True, desc=file.name) as pbar:
+            self.s3.upload_file(
+                Filename=file,
+                Bucket=self.upload_bucket,
+                Key=file.name,
+                Callback=lambda bytes_transferred: pbar.update(bytes_transferred),
+            )
         self.upload_history.append(file.name)
         with open(self.upload_fp, "w") as f:
             json.dump(self.upload_history, f)
-        os.remove(file)
+        os.rename(file, self.input_archive / file.name)
     
     def _manage_input(self):
         while self.running:

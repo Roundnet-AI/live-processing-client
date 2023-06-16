@@ -6,7 +6,7 @@ jobs:
   deploy:
     runs-on: windows-latest
     env:
-      tag: v1.0.0
+      tag: v1.0.1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
