@@ -85,6 +85,10 @@ class FileManagerClient:
         Args:
             file (Path): File to upload.
         """
+        if " " in file.name:
+            print(f"Renaming {file} without spaces.")
+            os.rename(file, file.with_name(file.name.replace(" ", "_")))
+            file = file.with_name(file.name.replace(" ", "_"))
         print(f"Uploading {file} to S3...")
         file_size = os.stat(file).st_size
         with tqdm.tqdm(total=file_size, unit="B", unit_scale=True, desc=file.name) as pbar:
