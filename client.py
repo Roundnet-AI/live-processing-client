@@ -1,15 +1,21 @@
-import boto3
-from pathlib import Path
-import json
-import os
-import configparser
-import time
-import threading
-import signal
-import sys
 import traceback
-import tqdm
-from playsound import playsound
+
+try:
+    import boto3
+    from pathlib import Path
+    import json
+    import os
+    import configparser
+    import time
+    import threading
+    import signal
+    import sys
+    import tqdm
+    from playsound import playsound
+except Exception as e:
+    trace = traceback.format_exc()
+    print(trace)
+    input("Application failed. Read above information to determine root cause.")
 
 class FileManagerClient:
     def __init__(self, upload_bucket: str, download_bucket: str, aws_access_key_id: str, aws_secret_access_key: str, input: str = "./input", output: str = "./output", **kwargs):
