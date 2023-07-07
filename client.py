@@ -9,6 +9,7 @@ import signal
 import sys
 import traceback
 import tqdm
+from playsound import playsound
 
 class FileManagerClient:
     def __init__(self, upload_bucket: str, download_bucket: str, aws_access_key_id: str, aws_secret_access_key: str, input: str = "./input", output: str = "./output", **kwargs):
@@ -132,6 +133,7 @@ class FileManagerClient:
     def _download_file(self, file: str):
         print(f"Downloading {file} from S3...")
         self.s3.download_file(self.download_bucket, file, self.output / file)
+        playsound("notify.mp3")
         self.download_history.append(file)
         with open(self.download_fp, "w") as f:
             json.dump(self.download_history, f)

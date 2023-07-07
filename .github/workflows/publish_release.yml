@@ -6,7 +6,7 @@ jobs:
   deploy:
     runs-on: windows-latest
     env:
-      tag: v1.0.1
+      tag: v1.0.2
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -28,7 +28,7 @@ jobs:
       - name: Zip Necessary Files
         uses: vimtor/action-zip@v1
         with:
-          files: dist/RoundnetAI_TournamentClient_${{ env.tag }}.exe Config.ini Login_Example.ini README.md
+          files: dist/RoundnetAI_TournamentClient_${{ env.tag }}.exe Config.ini Login_Example.ini README.md notify.mp3
           dest: dist/RoundnetAI_TournamentClient_${{ env.tag }}.zip
 
       - name: Publish a New Release
